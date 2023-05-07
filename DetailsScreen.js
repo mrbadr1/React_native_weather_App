@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 
-const API_GOOGLE_KEY = 'AIzaSyCubdQAjDXz94wPw0WyIEUzRf9GKWUAovw';
+const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
 
 const DetailsScreen = ({ route }) => {
   const { weatherData } = route.params;
