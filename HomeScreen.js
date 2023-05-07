@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, Animated, Keyboard } from 'react-native';
 import axios from 'axios';
@@ -92,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     setIsInputEmpty(city === '');
     if (city === '') {
-
+        setIsSearchPressed(false);
       setWeatherData(null);
     }
   }, [city]);
