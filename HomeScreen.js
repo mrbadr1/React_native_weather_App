@@ -6,8 +6,8 @@ import { Button, Input } from 'react-native-elements';
 import Flag from 'react-native-flags';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const API_WEATHER_KEY = '50024a21f99ccf97ed1d7bef56931def';
-const API_GOOGLE_KEY = 'AIzaSyCubdQAjDXz94wPw0WyIEUzRf9GKWUAovw';
+const API_WEATHER_KEY = 'YOUR_WHEATERMAP_API_KEY_HERE';
+const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
 
 const HomeScreen = ({ navigation }) => {
   const [city, setCity] = useState('');
