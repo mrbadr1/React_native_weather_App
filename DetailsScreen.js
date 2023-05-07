@@ -1,10 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
-
 const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
-
 const DetailsScreen = ({ route }) => {
   const { weatherData } = route.params;
   const [cityDetails, setCityDetails] = useState(null);
@@ -61,7 +60,6 @@ const DetailsScreen = ({ route }) => {
               <Text style={styles.slideshowControlText} onPress={handleNextPhoto}>{'>'}</Text>
             </View>
           </View>
-          <Text style={styles.detailsText}>{cityDetails.formatted_address}</Text>
           <View style={styles.mapContainer}>
             <MapView style={styles.map} initialRegion={{
               latitude: cityDetails.geometry.location.lat,
@@ -94,8 +92,8 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
-    marginBottom: 30,
+    marginTop: 8,
+    marginBottom: 10,
   },
   headerText: {
     fontSize: 24,
@@ -146,9 +144,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   slideshowControlText: {
-    fontSize: 24,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFFB0D',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
