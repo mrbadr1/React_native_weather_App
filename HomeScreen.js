@@ -26,6 +26,7 @@ const HomeScreen = ({ navigation }) => {
             const citySuggestions = response.data.predictions.map(prediction => ({ label: prediction.structured_formatting.main_text, value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text } }));
             setCitySuggestions(citySuggestions);
             console.log(citySuggestions);
+            //in console u can see the cities i tried to make them inside the list but it s not working
           } 
       catch (error) {
            console.error(error);
@@ -33,7 +34,6 @@ const HomeScreen = ({ navigation }) => {
     fetchCitySuggestions(city);
   }, [city]);
   /////////////////////////////////////////
-
   const handleQueryChange = (text) => {
     setCity(text);
   };
@@ -43,22 +43,25 @@ const HomeScreen = ({ navigation }) => {
     setCitySuggestions([]);
   };
   /////////////////////////////////////////
-  const renderCityItem = ({ item }) => (
-    <TouchableHighlight
-      onPress={() => handleSelectCity(item)}
-      style={{ padding: 10 }}
-      underlayColor="#ccc"
-    >
-      <Text>{item.label}, {item.value.country}</Text>
-    </TouchableHighlight>
-  );
+  const renderCityItem = ({ item }) => {
+    console.log(item);
+    return (
+      <TouchableHighlight
+        onPress={() => handleSelectCity(item)}
+        style={{ padding: 10 }}
+        underlayColor="#ccc"
+      >
+        <Text>{item.value.city}</Text>
+      </TouchableHighlight>
+    );
+  };
   /////////////////////////////////////////
   const renderSuggestions = () => (
     <FlatList
       data={citySuggestions}
       renderItem={renderCityItem}
       keyExtractor={(item, index) => index.toString()}
-      style={{ maxHeight: 200 }}
+      style={{ maxHeight: 300 }}
     />
   );
   /////////////////////////////////////////
@@ -131,9 +134,10 @@ const HomeScreen = ({ navigation }) => {
   }
   /////////////////////////////////////////
   return (
-    <View style={{ textAlign:'center', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <View style={{flex: 1,
+      backgroundColor: '#F5FCFF', textAlign:'center', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {weatherData === null && (
-        <Animated.View style={{ alignItems: 'center', marginBottom: 50, marginTop: 30 }}>
+        <Animated.View style={{ alignItems: 'center', marginBottom: 50, marginTop: 20 }}>
           <Animated.Text style={{ fontSize: 39, fontFamily: 'Exo-Bold', marginBottom: 20, transform: [{ scale: pulseAnim }] }}>WEATHER APP </Animated.Text>
         </Animated.View>
       )}
@@ -142,7 +146,7 @@ const HomeScreen = ({ navigation }) => {
         defaultValue={city}
         onChangeText={handleQueryChange}
         renderItem={renderSuggestions}
-        containerStyle={{ width: '80%', maxHeight: 200, marginBottom: 20 }}
+        containerStyle={{ width: '80%', maxHeight: 300, marginBottom: 20 }}
         listStyle={{ marginTop: 2 }}
         placeholder="Enter a city name"
         value={city}
@@ -179,5 +183,5 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 };
-  /////////////////////////////////////////
+  /////////////////////////////////////////\
 export default HomeScreen;
