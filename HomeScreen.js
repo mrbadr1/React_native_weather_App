@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, Animated, Keyboard } from 'react-native';
+import { View, Text, Image, Animated, Keyboard, TouchableHighlight } from 'react-native';
 import axios from 'axios';
 import { useFonts } from 'expo-font';
 import { Button, Input } from 'react-native-elements';
@@ -18,6 +18,7 @@ const HomeScreen = ({ navigation }) => {
   const [isInputEmpty, setIsInputEmpty] = useState(true);
   const [isSearchPressed, setIsSearchPressed] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const fetchCitySuggestions = async (text) => {
@@ -60,6 +61,11 @@ const HomeScreen = ({ navigation }) => {
       setCitySuggestions([]);
       Keyboard.dismiss(); // Hide the keyboard
       setIsSearchPressed(true);
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 2300,
+        useNativeDriver: true,
+      }).start();
     } catch (error) {
       console.error(error);
     }
@@ -75,6 +81,11 @@ const HomeScreen = ({ navigation }) => {
     setCity('');
     setWeatherData(null);
     setCitySuggestions([]);
+    Animated.timing(opacityAnim, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
   };
 
   const renderCityItem = ({ item, index }) => {
@@ -95,6 +106,11 @@ const HomeScreen = ({ navigation }) => {
     if (city === '') {
         setIsSearchPressed(false);
       setWeatherData(null);
+      Animated.timing(opacityAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     }
   }, [city]);
 
@@ -126,11 +142,11 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ textAlign:'', alignItems: 'center', justifyContent: 'center' }}>
       {weatherData === null && (
-        <View style={{ alignItems: 'center', marginBottom: 50, marginTop: 30 }}>
-          <Animated.Text style={{ fontSize: 50, fontWeight: 'bold', fontFamily: 'weather', marginBottom: 20, transform: [{ scale: pulseAnim }] }}>Weather App </Animated.Text>
-        </View>
+        <Animated.View style={{ alignItems: 'center', marginBottom: 50, marginTop: 30 }}>
+          <Animated.Text style={{ fontSize: 39, fontFamily: 'Exo-Bold', marginBottom: 20, transform: [{ scale: pulseAnim }] }}>WEATHER APP </Animated.Text>
+        </Animated.View>
       )}
       <Input
         placeholder="Search for a city"
@@ -159,29 +175,33 @@ const HomeScreen = ({ navigation }) => {
         />
       )}
       {!isInputEmpty && !isSearchPressed && (
-        <Button
-          title="Search"
+        <TouchableHighlight
+          underlayColor="#ff0000"
+          style={{ borderWidth: 2, borderColor: '#ff0000', borderRadius: 10, overflow: 'hidden' }}
           onPress={fetchWeatherData}
-          buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320 }}
-          titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20 }}
-        />
+        >
+          <View style={{ backgroundColor: '#ff0000', padding: 15, height: 60, width: 320 }}>
+            <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 2 }}>Search</Text>
+          </View>
+        </TouchableHighlight>
       )}
       {weatherData && (
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
+        <Animated.View style={{ alignItems: 'center', marginTop: 20, opacity: opacityAnim }}>
           <Flag
             code={weatherData.sys.country}
             size={48}
             style={{ marginBottom: 20 }}
           />
-          <Text style={{ fontSize: 24, fontWeight: 'bold', fontFamily: 'Exo-Bold' }}>{weatherData.name}</Text>
-          <Animated.Text style={{ fontSize: 80, fontWeight: 'bold', fontFamily: 'Exo-Bold', marginTop: 20, transform: [{ scale: pulseAnim }] }}>{weatherData.main.temp}°C</Animated.Text>
+          <Text style={{ fontSize: 40, fontFamily: 'Exo-Bold' }}>{weatherData.name}</Text>
+          <Animated.Text style={{ fontSize: 60, fontFamily: 'Exo-Bold', marginTop: 10, transform: [{ scale: pulseAnim }] }}>{weatherData.main.temp}°C <Image source={require('./assets/icons/hot.png')} style={{ width: 80,height: 80 
+}}  /></Animated.Text>
           <Button
             title="Show more details"
             onPress={handleShowDetails}
             buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, marginTop: 20 }}
-            titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20 }}
+            titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontFamily: 'Exo-Bold', fontSize: 20 }}
           />
-        </View>
+        </Animated.View>
       )}
     </View>
   );
