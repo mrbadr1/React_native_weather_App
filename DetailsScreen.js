@@ -1,13 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
+
 const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
+
 const DetailsScreen = ({ route }) => {
   const { weatherData } = route.params;
   const [cityDetails, setCityDetails] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(null);
 
   useEffect(() => {
     const fetchCityDetails = async () => {
@@ -22,6 +24,24 @@ const DetailsScreen = ({ route }) => {
 
     fetchCityDetails();
   }, [weatherData.name]);
+
+  useEffect(() => {
+    const fetchCurrentTime = async () => {
+      try {
+        const response = await axios.get(`https://maps.googleapis.com/maps/api/timezone/json?location=${cityDetails.geometry.location.lat},${cityDetails.geometry.location.lng}&timestamp=${Math.floor(Date.now() / 1000)}&key=${API_GOOGLE_KEY}`);
+        const timestamp = Math.floor(Date.now() / 1000) + response.data.rawOffset + response.data.dstOffset - 3600; // subtract 1 hour
+        setCurrentTime(new Date(timestamp * 1000).toLocaleTimeString());
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (cityDetails) {
+      fetchCurrentTime();
+      const intervalId = setInterval(fetchCurrentTime, 1000);
+      return () => clearInterval(intervalId);
+    }
+  }, [cityDetails]);
 
   const fetchPlaceId = async (query) => {
     try {
@@ -44,12 +64,21 @@ const DetailsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+      <Image source={require('./assets/icons/cloud.png')} style={styles.humidityIcon} />
         <Text style={styles.headerText}>{weatherData.weather[0].description}</Text>
         <View style={styles.tempContainer}>
           <Text style={styles.tempText}>{weatherData.main.temp_min}°C</Text>
-          <Text style={[styles.tempText, { marginLeft: 20 }]}>{weatherData.main.temp_max}°C</Text>
+          <Text style={[styles.tempText, { marginLeft: 20 }]}>         {weatherData.main.temp_max}°C</Text>
         </View>
-        <Text style={styles.humidityText}>Humidity: {weatherData.main.humidity}%</Text>
+        <Image source={require('./assets/icons/drop.png')} style={styles.humidityIcon} />
+        <View style={styles.humidityContainer}>
+        <Text style={styles.humidityText}>humidity: </Text>
+          <Text style={styles.humidityText}>{weatherData.main.humidity}%</Text>
+         
+        </View>
+<Image source={require('./assets/icons/timeclock.gif')} style={{ width: 60,height: 60 }} />
+{currentTime && <Text style={styles.timeText}>
+{currentTime}</Text>}
       </View>
       {cityDetails && (
         <View style={styles.detailsContainer}>
@@ -110,7 +139,22 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontFamily: 'Exo-Bold',
   },
+  humidityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  humidityIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 5,
+  },
   humidityText: {
+    fontSize: 16,
+    fontFamily: 'Exo-Bold',
+  },
+  timeText: {
     fontSize: 16,
     fontFamily: 'Exo-Bold',
     marginTop: 2,
@@ -119,17 +163,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginTop: 20,
+    marginTop: 1,
   },
   slideshowContainer: {
     position: 'relative',
-    width: Dimensions.get('window').width,
+    width: Dimensions.get('window').width-40,
     height: 300,
   },
   image: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get('window').width-40,
     height: 300,
-    borderRadius: 10,
+    borderRadius: 39,
+    
   },
   slideshowControls: {
     position: 'absolute',
@@ -140,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
   },
   slideshowControlText: {
@@ -159,12 +204,14 @@ const styles = StyleSheet.create({
   mapContainer: {
     width: Dimensions.get('window').width - 40,
     height: 200,
-    marginTop: 20,
+    marginTop: 5,
     borderRadius: 10,
     overflow: 'hidden',
+    borderRadius: 39,
   },
   map: {
     flex: 1,
+    borderRadius: 39,
   },
   footer: {
     position: 'absolute',
