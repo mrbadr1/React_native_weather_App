@@ -1,3 +1,6 @@
+const API_WEATHER_KEY = 'YOUR_WHEATERMAP_API_KEY_HERE';
+const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
+/////////////////////////////////////////
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, Animated, Keyboard, FlatList ,TouchableHighlight } from 'react-native';
 import axios from 'axios';
@@ -5,42 +8,41 @@ import { useFonts } from 'expo-font';
 import { Button,  } from 'react-native-elements';
 import Flag from 'react-native-flags';
 import Autocomplete from 'react-native-autocomplete-input';
-const API_WEATHER_KEY = 'YOUR_WHEATERMAP_API_KEY_HERE';
-const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
-
+  /////////////////////////////////////////
 const HomeScreen = ({ navigation }) => {
+  /////////////////////////////////////////
   const [city, setCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
   const [citySuggestions, setCitySuggestions] = useState([]);
-  const [isFocused, setIsFocused] = useState(false);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
   const [isSearchPressed, setIsSearchPressed] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
-
+  /////////////////////////////////////////
   useEffect(() => {
     const fetchCitySuggestions = async (text) => {
       try {
-        const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&types=(cities)&key=${API_GOOGLE_KEY}`);
-        const citySuggestions = response.data.predictions.map(prediction => ({ label: prediction.structured_formatting.main_text, value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text } }));
-        setCitySuggestions(citySuggestions);
-        console.log(citySuggestions);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+            const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&types=(cities)&key=${API_GOOGLE_KEY}`);
+            const citySuggestions = response.data.predictions.map(prediction => ({ label: prediction.structured_formatting.main_text, value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text } }));
+            setCitySuggestions(citySuggestions);
+            console.log(citySuggestions);
+          } 
+      catch (error) {
+           console.error(error);
+          }};
     fetchCitySuggestions(city);
   }, [city]);
+  /////////////////////////////////////////
 
   const handleQueryChange = (text) => {
     setCity(text);
   };
-
+    /////////////////////////////////////////
   const handleSelectCity = (city) => {
     setCity(city.label);
     setCitySuggestions([]);
   };
-
+  /////////////////////////////////////////
   const renderCityItem = ({ item }) => (
     <TouchableHighlight
       onPress={() => handleSelectCity(item)}
@@ -50,7 +52,7 @@ const HomeScreen = ({ navigation }) => {
       <Text>{item.label}, {item.value.country}</Text>
     </TouchableHighlight>
   );
-
+  /////////////////////////////////////////
   const renderSuggestions = () => (
     <FlatList
       data={citySuggestions}
@@ -59,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
       style={{ maxHeight: 200 }}
     />
   );
-
+  /////////////////////////////////////////
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -76,7 +78,7 @@ const HomeScreen = ({ navigation }) => {
       ])
     ).start();
   }, [pulseAnim]);
-
+  /////////////////////////////////////////
   const fetchWeatherData = async () => {
     try {
       const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_WEATHER_KEY}&units=metric`);
@@ -93,7 +95,7 @@ const HomeScreen = ({ navigation }) => {
       console.error(error);
     }
   };
-
+  /////////////////////////////////////////
   useEffect(() => {
     setIsInputEmpty(city === '');
     if (city === '') {
@@ -106,29 +108,28 @@ const HomeScreen = ({ navigation }) => {
       }).start();
     }
   }, [city]);
-
+  /////////////////////////////////////////
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (city !== '' && weatherData !== null) {
         fetchWeatherData();
       }
     }, 60000); // Fetch weather data every minute
-
     return () => clearInterval(intervalId);
   }, [city, weatherData]);
-
+  /////////////////////////////////////////
   const handleShowDetails = () => {
     navigation.navigate('Details', { weatherData });
   };
-
+  /////////////////////////////////////////
   const [loaded] = useFonts({
     'weather': require('./assets/fonts/Weather.otf'),
   });
-
+  /////////////////////////////////////////
   if (!loaded) {
     return null;
   }
-
+  /////////////////////////////////////////
   return (
     <View style={{ textAlign:'center', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {weatherData === null && (
@@ -178,5 +179,5 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 };
-
+  /////////////////////////////////////////
 export default HomeScreen;
