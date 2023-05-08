@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, Animated, Keyboard, TouchableHighlight } from 'react-native';
+import { View, Text, Image, Animated, Keyboard, FlatList ,TouchableHighlight } from 'react-native';
 import axios from 'axios';
 import { useFonts } from 'expo-font';
-import { Button, Input } from 'react-native-elements';
+import { Button,  } from 'react-native-elements';
 import Flag from 'react-native-flags';
-import DropDownPicker from 'react-native-dropdown-picker';
-
+import Autocomplete from 'react-native-autocomplete-input';
 const API_WEATHER_KEY = 'YOUR_WHEATERMAP_API_KEY_HERE';
 const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
 
@@ -31,11 +29,36 @@ const HomeScreen = ({ navigation }) => {
         console.error(error);
       }
     };
-
-    if (city.length > 0) {
-      fetchCitySuggestions(city);
-    }
+    fetchCitySuggestions(city);
   }, [city]);
+
+  const handleQueryChange = (text) => {
+    setCity(text);
+  };
+
+  const handleSelectCity = (city) => {
+    setCity(city.label);
+    setCitySuggestions([]);
+  };
+
+  const renderCityItem = ({ item }) => (
+    <TouchableHighlight
+      onPress={() => handleSelectCity(item)}
+      style={{ padding: 10 }}
+      underlayColor="#ccc"
+    >
+      <Text>{item.label}, {item.value.country}</Text>
+    </TouchableHighlight>
+  );
+
+  const renderSuggestions = () => (
+    <FlatList
+      data={citySuggestions}
+      renderItem={renderCityItem}
+      keyExtractor={(item, index) => index.toString()}
+      style={{ maxHeight: 200 }}
+    />
+  );
 
   useEffect(() => {
     Animated.loop(
@@ -71,36 +94,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const handleCityPress = (cityObj) => {
-    setCity(cityObj.city);
-    setWeatherData(null);
-    setCitySuggestions([]);
-  };
-
-  const handleClearInput = () => {
-    setCity('');
-    setWeatherData(null);
-    setCitySuggestions([]);
-    Animated.timing(opacityAnim, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const renderCityItem = ({ item, index }) => {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Flag
-          code={item.value.country}
-          size={60}
-          style={{ marginRight: 10 }}
-        />
-        <Text>{item.label}</Text>
-      </View>
-    );
-  };
-
   useEffect(() => {
     setIsInputEmpty(city === '');
     if (city === '') {
@@ -128,11 +121,6 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Details', { weatherData });
   };
 
-  const handleSelectCity = (item) => {
-    setCity(item.value.city);
-    setCitySuggestions([]);
-  };
-
   const [loaded] = useFonts({
     'weather': require('./assets/fonts/Weather.otf'),
   });
@@ -142,45 +130,29 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={{ textAlign:'', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ textAlign:'center', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {weatherData === null && (
         <Animated.View style={{ alignItems: 'center', marginBottom: 50, marginTop: 30 }}>
           <Animated.Text style={{ fontSize: 39, fontFamily: 'Exo-Bold', marginBottom: 20, transform: [{ scale: pulseAnim }] }}>WEATHER APP </Animated.Text>
         </Animated.View>
       )}
-      <Input
-        placeholder="Search for a city"
-        onChangeText={text => {
-          setCity(text);
-        }}
+      <Autocomplete
+        data={citySuggestions}
+        defaultValue={city}
+        onChangeText={handleQueryChange}
+        renderItem={renderSuggestions}
+        containerStyle={{ width: '80%', maxHeight: 200, marginBottom: 20 }}
+        listStyle={{ marginTop: 2 }}
+        placeholder="Enter a city name"
         value={city}
-        containerStyle={{ width: '80%', marginBottom: 20, alignItems: 'center', borderWidth: 2, borderColor: isFocused ? '#00bfff' : '#ccc', borderRadius: 10, padding: 10, boxShadow: isFocused ? '0 0 10px #00bfff' : 'none' }}
-        inputStyle={{ fontWeight: 'bold', textAlign: 'center' }}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        onClear={handleClearInput}
-        underlineColorAndroid='transparent'
-        placeholderStyle={{ color: 'transparent' }}
       />
-      {citySuggestions.length > 0 && (
-        <DropDownPicker
-          items={citySuggestions.map(suggestion => ({ label: suggestion.label, value: suggestion.value }))}
-          searchable={true}
-          onChangeItem={handleSelectCity}
-          containerStyle={{ width: '80%', maxHeight: 200, marginBottom: 20 }}
-          zIndex={99999}
-          placeholder="cities suggestions list"
-          renderItem={renderCityItem}
-          dropDownContainerStyle={{ marginTop: 2 }}
-        />
-      )}
       {!isInputEmpty && !isSearchPressed && (
         <TouchableHighlight
           underlayColor="#ff0000"
-          style={{ borderWidth: 2, borderColor: '#ff0000', borderRadius: 10, overflow: 'hidden' }}
+          style={{ borderWidth: 2, borderColor: '#ff0000', borderRadius: 10, overflow: 'hidden', position: 'absolute', top: 220, width: '80%' }}
           onPress={fetchWeatherData}
         >
-          <View style={{ backgroundColor: '#ff0000', padding: 15, height: 60, width: 320 }}>
+          <View style={{ backgroundColor: '#ff0000', padding: 15, height: 60 }}>
             <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 2 }}>Search</Text>
           </View>
         </TouchableHighlight>
@@ -198,7 +170,7 @@ const HomeScreen = ({ navigation }) => {
           <Button
             title="Show more details"
             onPress={handleShowDetails}
-            buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, marginTop: 20 }}
+            buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, marginTop: 30 }}
             titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontFamily: 'Exo-Bold', fontSize: 20 }}
           />
         </Animated.View>
