@@ -1,2 +1,2 @@
-export const API_WEATHER_KEY = 'e3b7cd321820914819d562191266f3d1';
-export const API_GOOGLE_KEY = 'AIzaSyCubdQAjDXz94wPw0WyIEUzRf9GKWUAovw';
+export const API_WEATHER_KEY = 'API_WEATHER_KEY';
+export const API_GOOGLE_KEY = 'API_GOOGLE_KEY';
