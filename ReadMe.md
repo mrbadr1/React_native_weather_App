@@ -1,6 +1,7 @@
 Necessary packages :
 
-Weather App
+  ## Weather App
+  -------------------
 
 This is a React Native weather application that allows users to search for the current weather in a specified city. The app uses the OpenWeather API to fetch weather data and the Google Places API to provide autocomplete suggestions as the user types in the search field.
 
@@ -13,6 +14,10 @@ Animated pulse effect when the app is launched
 Display a message when no weather data is available
 Navigate to a details page for more information
 
+## screenshot 
+
+![](https://github.com/Your_Repository_Name/Your_GIF_Name.gif)
+
 Getting started
 
 Prerequisites
@@ -22,14 +27,22 @@ Before you begin, make sure you have the following installed:
 Node.js
 Expo CLI
 Yarn
-Installing
+
+## Install
+     $npm install expo-font @react-navigation/native @react-navigation/stack axios react-native-elements react-native-flags react-native-autocomplete-input react-native-dropdown-picker react-native-maps
+     
+## expo runtime
+     
+     $expo install react-native-reanimated@2.14.4
+
+## Usage
 Clone this repository to your local machine
 Open a terminal in the project directory and run yarn install to install dependencies
 Create a .env file in the project root directory and add your OpenWeather and Google Places API keys as follows:
 ---------------------------
-npm install expo-font @react-navigation/native @react-navigation/stack axios react-native-elements react-native-flags react-native-autocomplete-input react-native-dropdown-picker react-native-maps
 
-expo install react-native-reanimated@2.14.4
+
+
 
 ----------------------------
 API_WEATHER_KEY=<your OpenWeather API key>
