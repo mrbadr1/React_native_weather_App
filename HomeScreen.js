@@ -1,70 +1,70 @@
-const API_WEATHER_KEY = 'YOUR_WHEATERMAP_API_KEY_HERE';
-const API_GOOGLE_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
-/////////////////////////////////////////
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, Animated, Keyboard, FlatList ,TouchableHighlight } from 'react-native';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, FlatList, Text, Keyboard, Animated, TouchableHighlight, Image } from 'react-native';
+import { API_GOOGLE_KEY, API_WEATHER_KEY } from './API_KEYS';
 import { useFonts } from 'expo-font';
-import { Button,  } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import Flag from 'react-native-flags';
-import Autocomplete from 'react-native-autocomplete-input';
-  /////////////////////////////////////////
-const HomeScreen = ({ navigation }) => {
-  /////////////////////////////////////////
+import axios from 'axios';
+const HomeScreen = ({ navigation }) => { 
   const [city, setCity] = useState('');
-  const [weatherData, setWeatherData] = useState(null);
   const [citySuggestions, setCitySuggestions] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
   const [isSearchPressed, setIsSearchPressed] = useState(false);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  /////////////////////////////////////////
-  useEffect(() => {
-    const fetchCitySuggestions = async (text) => {
-      try {
-            const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&types=(cities)&key=${API_GOOGLE_KEY}`);
-            const citySuggestions = response.data.predictions.map(prediction => ({ label: prediction.structured_formatting.main_text, value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text } }));
-            setCitySuggestions(citySuggestions);
-            console.log(citySuggestions);
-            //in console u can see the cities i tried to make them inside the list but it s not working
-          } 
-      catch (error) {
-           console.error(error);
-          }};
-    fetchCitySuggestions(city);
-  }, [city]);
-  /////////////////////////////////////////
-  const handleQueryChange = (text) => {
-    setCity(text);
+  const [opacityAnim] = useState(new Animated.Value(0));
+  const [pulseAnim] = useState(new Animated.Value(1));
+
+  const fetchCitySuggestions = async (text) => {
+    try {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${API_GOOGLE_KEY}`);
+     
+      const citySuggestions = response.data.predictions.map(prediction => ({
+        label: prediction.structured_formatting.main_text.toString(),
+        value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text },
+        id: prediction.place_id,
+      }));      
+      setCitySuggestions(citySuggestions);
+    } catch (error) {
+      console.error(error);
+    }
   };
-    /////////////////////////////////////////
-  const handleSelectCity = (city) => {
+
+  const handleCityChange = (text) => {
+    setCity(text);
+    fetchCitySuggestions(text);
+  };
+
+  const handleCitySelect = (city) => {
     setCity(city.label);
     setCitySuggestions([]);
   };
-  /////////////////////////////////////////
-  const renderCityItem = ({ item }) => {
-    console.log(item);
-    return (
-      <TouchableHighlight
-        onPress={() => handleSelectCity(item)}
-        style={{ padding: 10 }}
-        underlayColor="#ccc"
-      >
-        <Text>{item.value.city}</Text>
-      </TouchableHighlight>
-    );
-  };
-  /////////////////////////////////////////
-  const renderSuggestions = () => (
-    <FlatList
-      data={citySuggestions}
-      renderItem={renderCityItem}
-      keyExtractor={(item, index) => index.toString()}
-      style={{ maxHeight: 300 }}
-    />
+
+  const renderCityItem = ({ item }) => (
+ <View>
+ <View style={{ borderRadius:20,textAlign:"center",backgroundColor:"#BBB",marginTop:2 }}><Text onPress={() => handleCitySelect(item)} style={{ alignItems: 'center',
+    fontSize: 20,fontFamily: 'Exo-Bold',left:5
+   }}>{item.label}</Text></View>
+</View>
+    
   );
-  /////////////////////////////////////////
+
+  const fetchWeatherData = async () => {
+    try {
+      const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_WEATHER_KEY}&units=metric`);
+      setWeatherData(response.data);
+      setCitySuggestions([]);
+      Keyboard.dismiss();
+      setIsSearchPressed(true);
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 2300,
+        useNativeDriver: true,
+      }).start();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -81,29 +81,13 @@ const HomeScreen = ({ navigation }) => {
       ])
     ).start();
   }, [pulseAnim]);
-  /////////////////////////////////////////
-  const fetchWeatherData = async () => {
-    try {
-      const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_WEATHER_KEY}&units=metric`);
-      setWeatherData(response.data);
-      setCitySuggestions([]);
-      Keyboard.dismiss(); // Hide the keyboard
-      setIsSearchPressed(true);
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 2300,
-        useNativeDriver: true,
-      }).start();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  /////////////////////////////////////////
+
   useEffect(() => {
     setIsInputEmpty(city === '');
     if (city === '') {
-        setIsSearchPressed(false);
+      setIsSearchPressed(false);
       setWeatherData(null);
+      setCitySuggestions([]);
       Animated.timing(opacityAnim, {
         toValue: 0,
         duration: 500,
@@ -111,77 +95,92 @@ const HomeScreen = ({ navigation }) => {
       }).start();
     }
   }, [city]);
-  /////////////////////////////////////////
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (city !== '' && weatherData !== null) {
         fetchWeatherData();
       }
-    }, 60000); // Fetch weather data every minute
+    }, 60000);
     return () => clearInterval(intervalId);
   }, [city, weatherData]);
-  /////////////////////////////////////////
+
   const handleShowDetails = () => {
     navigation.navigate('Details', { weatherData });
   };
-  /////////////////////////////////////////
+  
   const [loaded] = useFonts({
     'weather': require('./assets/fonts/Weather.otf'),
   });
-  /////////////////////////////////////////
+
   if (!loaded) {
     return null;
   }
-  /////////////////////////////////////////
+
   return (
-    <View style={{flex: 1,
-      backgroundColor: '#F5FCFF', textAlign:'center', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-      {weatherData === null && (
-        <Animated.View style={{ alignItems: 'center', marginBottom: 50, marginTop: 20 }}>
-          <Animated.Text style={{ fontSize: 39, fontFamily: 'Exo-Bold', marginBottom: 20, transform: [{ scale: pulseAnim }] }}>WEATHER APP </Animated.Text>
-        </Animated.View>
-      )}
-      <Autocomplete
-        data={citySuggestions}
-        defaultValue={city}
-        onChangeText={handleQueryChange}
-        renderItem={renderSuggestions}
-        containerStyle={{ width: '80%', maxHeight: 300, marginBottom: 20 }}
-        listStyle={{ marginTop: 2 }}
-        placeholder="Enter a city name"
-        value={city}
-      />
-      {!isInputEmpty && !isSearchPressed && (
-        <TouchableHighlight
-          underlayColor="#ff0000"
-          style={{ borderWidth: 2, borderColor: '#ff0000', borderRadius: 10, overflow: 'hidden', position: 'absolute', top: 220, width: '80%' }}
-          onPress={fetchWeatherData}
-        >
-          <View style={{ backgroundColor: '#ff0000', padding: 15, height: 60 }}>
-            <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', fontSize: 20, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 2 }}>Search</Text>
-          </View>
-        </TouchableHighlight>
-      )}
+    <View  style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+<View style={{ position: 'absolute', top: 50, left: 0, right: 0, alignItems: 'center' }}>
+  <TextInput 
+    placeholder="Enter city name"
+    placeholderTextColor="#ccc"
+    value={city}
+    onChangeText={handleCityChange}
+    style={{ backgroundColor: '#fff', padding: 15, borderRadius: 20, width: '80%', fontSize: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 ,textAlign: 'center'}}
+  />
+</View>
+
+{!isInputEmpty && !isSearchPressed && (
+<View style={{ position: 'absolute', top: 250,}}>
+    <Button
+    title="SEARCH"
+    onPress={fetchWeatherData}
+    buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, borderRadius: 20,shadowColor: '#000'}}
+    titleStyle={{ fontSize: 18 }}
+  />
+  </View>
+        )}
+<View style={{ position: 'absolute', top: 112,left: 0, right: 0 ,alignItems: 'center'}}>
+{citySuggestions.length > 0 && (
+  <FlatList
+    data={citySuggestions}
+    renderItem={renderCityItem}
+    keyExtractor={(item) => item.id}
+    style={{ borderWidth: 3, borderColor: '#ccc', borderRadius: 20, width: '90%',backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5, width: '80%' }}
+    contentContainerStyle={{ paddingHorizontal: 10, paddingVertical: 5 }}
+  />
+)}
+</View>
+        <View>
+
       {weatherData && (
-        <Animated.View style={{ alignItems: 'center', marginTop: 20, opacity: opacityAnim }}>
+
+      
+        <Animated.View style={{ alignItems: 'center', marginTop: 30, opacity: opacityAnim }}>
+                 <View style={{ alignItems: 'center',
+         backgroundColor: '#fff',
+         borderRadius:30,
+         flexDirection: 'column',
+         alignItems: 'center',
+         justifyContent: 'center',
+         width: '100%',
+        }}>
           <Flag
             code={weatherData.sys.country}
             size={48}
-            style={{ marginBottom: 20 }}
           />
           <Text style={{ fontSize: 40, fontFamily: 'Exo-Bold' }}>{weatherData.name}</Text>
-          <Animated.Text style={{ fontSize: 60, fontFamily: 'Exo-Bold', marginTop: 10, transform: [{ scale: pulseAnim }] }}>{weatherData.main.temp}°C <Image source={require('./assets/icons/hot.png')} style={{ width: 80,height: 80 
-}}  /></Animated.Text>
+          <Animated.Text style={{ fontSize: 50, fontFamily: 'Exo-Bold', marginTop: 5, transform: [{ scale: pulseAnim }] }}>{Math.round(weatherData.main.temp)}°C <Image source={require('./assets/icons/hot.png')} style={{ width: 40, height: 40 }} /></Animated.Text>
+          </View>
           <Button
             title="Show more details"
             onPress={handleShowDetails}
-            buttonStyle={{ backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, marginTop: 30 }}
-            titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontFamily: 'Exo-Bold', fontSize: 20 }}
+            buttonStyle={{ borderRadius:30, backgroundColor: '#00bfff', padding: 15, height: 60, width: 320, marginTop: 30 }}
+            titleStyle={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 20 }}
           />
         </Animated.View>
       )}
+      </View>
     </View>
   );
 };
-  /////////////////////////////////////////\
 export default HomeScreen;
