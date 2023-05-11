@@ -47,27 +47,12 @@ Before you begin, make sure you have the following installed:
 -Press the search button to fetch and display the weather data
 -Press the details button to navigate to the details page
   
-## Dependencies
-  
-axios: "^0.23.0"
-expo: "^42.0.0"
-expo-font: "^10.0.4"
-react: "17.0.2"
-react-native: "0.64.2"
-react-native-autocomplete-input: "^4.2.0"
-react-native-dropdown-picker: "^6.0.12"
-react-native-elements: "^3.4.2"
-react-native-flags: "^1.1.2"
-react-native-gesture-handler: "^1.10.3"
-react-native-reanimated: "^2.2.0"
-react-native-safe-area-context: "^3.2.0"
-react-native-screens: "^3.6.0"
-react-native-svg: "^12.1.1"
-  
 ## Authors
 ----------------
 ABROUK BADRE 
 
 ## License
-  
+
+ Copyright (c) 2023 ABROUK BADRE
+ 
 This project is licensed under the MIT License - see the LICENSE file for details.
