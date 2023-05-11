@@ -33,15 +33,21 @@ expo install react-native-reanimated@2.14.4
 
 ----------------------------
 API_WEATHER_KEY=<your OpenWeather API key>
+  
 API_GOOGLE_KEY=<your Google Places API key>
+  
 Run the app
+  
 expo start or yarn start
+  
 Usage
 Enter the name of the city you want to check the weather for in the search field
 Select the desired city from the autocomplete suggestions
 Press the search button to fetch and display the weather data
 Press the details button to navigate to the details page
+  
 Dependencies
+  
 axios: "^0.23.0"
 expo: "^42.0.0"
 expo-font: "^10.0.4"
@@ -56,7 +62,11 @@ react-native-reanimated: "^2.2.0"
 react-native-safe-area-context: "^3.2.0"
 react-native-screens: "^3.6.0"
 react-native-svg: "^12.1.1"
+  
 Authors
+  
 Mrbadr1
+  
 License
+  
 This project is licensed under the MIT License - see the LICENSE file for details.
