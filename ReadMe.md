@@ -1,16 +1,11 @@
-Necessary packages :
-
-  ## Weather App
+## Weather App
   -------------------
+![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2RhNzcwZWU0YWEwNmY5ZGQwZGQwMDE2ZDg0ZWYxNGQ4MjI5ODQ5ZSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/6S4gq5Zkwi5cTZBOfl/giphy.gif)
 
 This is a React Native weather application that allows users to search for the current weather in a specified city. The app uses the OpenWeather API to fetch weather data and the Google Places API to provide autocomplete suggestions as the user types in the search field.
 
-## screenshot 
-
-![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2RhNzcwZWU0YWEwNmY5ZGQwZGQwMDE2ZDg0ZWYxNGQ4MjI5ODQ5ZSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/6S4gq5Zkwi5cTZBOfl/giphy.gif)
-
-Features
-
+## Features
+---------------------
 - Search for weather by city name
 - Autocomplete suggestions
 - Display current temperature, weather condition, and country flag
@@ -29,31 +24,30 @@ Before you begin, make sure you have the following installed:
 - Yarn
 
 ## Install
-     $npm install expo-font @react-navigation/native @react-navigation/stack axios react-native-elements react-native-flags react-native-autocomplete-input react-native-dropdown-picker react-native-maps
+    npm install expo-font @react-navigation/native @react-navigation/stack axios react-native-elements react-native-flags react-native-autocomplete-input react-native-dropdown-picker react-native-maps
      
-## expo runtime
+## Expo reanimated
      
-     $expo install react-native-reanimated@2.14.4
+    expo install react-native-reanimated@2.14.4
 
 ## Usage
-Clone this repository to your local machine
-Open a terminal in the project directory and run yarn install to install dependencies
-Create a .env file in the project root directory and add your OpenWeather and Google Places API keys as follows:
-----------------------------
-    API_WEATHER_KEY=<your OpenWeather API key>  
-    API_GOOGLE_KEY=<your Google Places API key>
+
+- Clone this repository to your local machine
+
+- Open a terminal in the project directory and run yarn install to install dependencies
+
+- add your OpenWeather and Google Places API keys in app.js 
   
 ## Run the app
   
-     $expo start or yarn start
+     expo start or yarn start
+
+-Enter the name of the city you want to check the weather for in the search field
+-Select the desired city from the suggestions
+-Press the search button to fetch and display the weather data
+-Press the details button to navigate to the details page
   
-Usage
-Enter the name of the city you want to check the weather for in the search field
-Select the desired city from the autocomplete suggestions
-Press the search button to fetch and display the weather data
-Press the details button to navigate to the details page
-  
-Dependencies
+## Dependencies
   
 axios: "^0.23.0"
 expo: "^42.0.0"
@@ -70,10 +64,10 @@ react-native-safe-area-context: "^3.2.0"
 react-native-screens: "^3.6.0"
 react-native-svg: "^12.1.1"
   
-Authors
-  
-Mrbadr1
-  
-License
+## Authors
+----------------
+ABROUK BADRE 
+
+## License
   
 This project is licensed under the MIT License - see the LICENSE file for details.
