@@ -16,7 +16,7 @@ Features
 
 ## screenshot 
 
-![Alt Text](https://github.com/mrbadr1/React_native_weather_App/Screenshot.gif)
+![](/github.com/mrbadr1/React_native_weather_App/Screenshot.gif)
 
 Getting started
 
