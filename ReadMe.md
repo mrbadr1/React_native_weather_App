@@ -7,20 +7,20 @@ This is a React Native weather application that allows users to search for the c
 
 Features
 
-Search for weather by city name
-Autocomplete suggestions
-Display current temperature, weather condition, and country flag
-Animated pulse effect when the app is launched
-Display a message when no weather data is available
-Navigate to a details page for more information
+- Search for weather by city name
+- Autocomplete suggestions
+- Display current temperature, weather condition, and country flag
+- Animated pulse effect when the app is launched
+- Display a message when no weather data is available
+- Navigate to a details page for more information
 
 ## screenshot 
 
-![](https://github.com/Your_Repository_Name/Your_GIF_Name.gif)
+![Alt Text](https://github.com/mrbadr1/React_native_weather_App/Screenshot.gif)
 
 Getting started
 
-Prerequisites
+## Prerequisites
 
 Before you begin, make sure you have the following installed:
 
