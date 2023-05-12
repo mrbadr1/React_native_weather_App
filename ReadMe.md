@@ -1,6 +1,8 @@
 ## Weather App
   -------------------
-![](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2RhNzcwZWU0YWEwNmY5ZGQwZGQwMDE2ZDg0ZWYxNGQ4MjI5ODQ5ZSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/6S4gq5Zkwi5cTZBOfl/giphy.gif)
+  
+  
+  ![](https://media.giphy.com/media/7XROH5Qm8UQ7h7Tuxf/giphy.gif)
 
 This is a React Native weather application that allows users to search for the current weather in a specified city. The app uses the OpenWeather API to fetch weather data and the Google Places API to provide autocomplete suggestions as the user types in the search field.
 
