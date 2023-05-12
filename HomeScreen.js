@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, Text, Keyboard, Animated, TouchableHighlight, Image } from 'react-native';
+import { View, TextInput, FlatList, Text, Keyboard, Animated, TouchableOpacity , Image } from 'react-native';
 import { API_GOOGLE_KEY, API_WEATHER_KEY } from './API_KEYS';
 import { useFonts } from 'expo-font';
 import { Button } from 'react-native-elements';
@@ -11,41 +11,57 @@ const HomeScreen = ({ navigation }) => {
   const [weatherData, setWeatherData] = useState(null);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
   const [isSearchPressed, setIsSearchPressed] = useState(false);
+  const [error, setError] = useState(null);
+
   const [opacityAnim] = useState(new Animated.Value(0));
   const [pulseAnim] = useState(new Animated.Value(1));
 
   const fetchCitySuggestions = async (text) => {
     try {
       const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${API_GOOGLE_KEY}`);
-     
-      const citySuggestions = response.data.predictions.map(prediction => ({
-        label: prediction.structured_formatting.main_text.toString(),
-        value: { city: prediction.structured_formatting.main_text, country: prediction.structured_formatting.secondary_text },
-        id: prediction.place_id,
-      }));      
+      const citySuggestions = await Promise.all(response.data.predictions.map(async prediction => {
+        const geocodeResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?place_id=${prediction.place_id}&key=${API_GOOGLE_KEY}`);
+        const countryComponent = geocodeResponse.data.results[0].address_components.find(component => component.types.includes("country"));
+        const country = countryComponent ? countryComponent.short_name : null;
+        return {
+          label: prediction.structured_formatting.main_text.toString(),
+          value: { city: prediction.structured_formatting.main_text, country },
+          id: prediction.place_id,
+        };
+      }));
       setCitySuggestions(citySuggestions);
     } catch (error) {
       console.error(error);
+      setError(error.message);
+      ToastAndroid.show(error, ToastAndroid.SHORT);
     }
   };
-
+////////////////////////////
   const handleCityChange = (text) => {
     setCity(text);
     fetchCitySuggestions(text);
   };
-
+/////////////////////////////
   const handleCitySelect = (city) => {
     setCity(city.label);
     setCitySuggestions([]);
   };
-
+/////////////////////////////////////////
   const renderCityItem = ({ item }) => (
  <View>
- <View style={{ borderRadius:20,textAlign:"center",backgroundColor:"#BBB",marginTop:2 }}><Text onPress={() => handleCitySelect(item)} style={{ alignItems: 'center',
-    fontSize: 20,fontFamily: 'Exo-Bold',left:5
-   }}>{item.label}</Text></View>
-</View>
-    
+    <TouchableOpacity onPress={() => handleCitySelect(item)}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}>
+        
+        {item.value.country && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
+            <Text style={{ marginLeft: 5, color: '#999' }}>{item.value.country}</Text>
+            <Flag code={item.value.country} size={24} style={{ marginLeft: 5}} />
+          </View>
+        )}
+        <Text style={{ fontSize: 16 , marginLeft: 5}}>{item.label}</Text>
+      </View>
+    </TouchableOpacity>
+</View>  
   );
 
   const fetchWeatherData = async () => {
@@ -62,9 +78,10 @@ const HomeScreen = ({ navigation }) => {
       }).start();
     } catch (error) {
       console.error(error);
+      setError(error.message);
+      ToastAndroid.show(error, ToastAndroid.SHORT);
     }
   };
-
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -93,8 +110,11 @@ const HomeScreen = ({ navigation }) => {
         duration: 500,
         useNativeDriver: true,
       }).start();
+    } else if(city !==''){
+      setWeatherData(null);
     }
   }, [city]);
+  
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -130,7 +150,7 @@ const HomeScreen = ({ navigation }) => {
 </View>
 
 {!isInputEmpty && !isSearchPressed && (
-<View style={{ position: 'absolute', top: 250,}}>
+<View style={{ position: 'absolute', top: 250 }}>
     <Button
     title="SEARCH"
     onPress={fetchWeatherData}
@@ -151,10 +171,7 @@ const HomeScreen = ({ navigation }) => {
 )}
 </View>
         <View>
-
       {weatherData && (
-
-      
         <Animated.View style={{ alignItems: 'center', marginTop: 30, opacity: opacityAnim }}>
                  <View style={{ alignItems: 'center',
          backgroundColor: '#fff',
